@@ -16,12 +16,14 @@
 
 package com.github.javaparser.symbolsolver.logic;
 
+import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.symbolsolver.model.declarations.MethodDeclaration;
 import com.github.javaparser.symbolsolver.model.declarations.ReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.model.methods.MethodUsage;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceType;
 
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Set;
 
 /**
@@ -30,6 +32,40 @@ import java.util.Set;
  * @author Federico Tomassetti
  */
 public abstract class AbstractTypeDeclaration implements ReferenceTypeDeclaration {
+
+    private IdentityHashMap<DataKey<?>, Object> data = null;
+
+    /**
+     * Gets data for this component using the given key.
+     *
+     * @param <M> The type of the data.
+     * @param key The key for the data
+     * @return The data or null of no data was found for the given key
+     * @see DataKey
+     */
+    @SuppressWarnings("unchecked")
+    public <M> M getData(final DataKey<M> key) {
+        if (data == null) {
+            return null;
+        }
+        return (M) data.get(key);
+    }
+
+    /**
+     * Sets data for this component using the given key.
+     * For information on creating DataKey, see {@link DataKey}.
+     *
+     * @param <M> The type of data
+     * @param key The singleton key for the data
+     * @param object The data object
+     * @see DataKey
+     */
+    public <M> void setData(DataKey<M> key, M object) {
+        if (data == null) {
+            data = new IdentityHashMap<>();
+        }
+        data.put(key, object);
+    }
 
     @Override
     public final Set<MethodUsage> getAllMethods() {
